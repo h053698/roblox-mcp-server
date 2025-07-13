@@ -8,7 +8,11 @@ A custom MCP (Multi-Channel Presence) server built to enhance the Roblox experie
 - 🎮 Display a list of friends who are currently in-game.
 - 🚀 Join a friend’s game directly via Roblox deep links.
 
-![DemoVideo](https://hc-cdn.hel1.your-objectstorage.com/s/v3/b9b16af8eeca3d65ff7193048549ea330abfe448_screen_recording_2025-07-13_at_11.26.11___pm.mp4)
+
+https://github.com/user-attachments/assets/f10af4e9-28b7-41d8-9fea-181f168f83a0
+
+
+
 
 ## Getting Started
 
