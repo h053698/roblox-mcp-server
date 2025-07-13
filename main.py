@@ -1,11 +1,11 @@
 from fastmcp import FastMCP
 from rbxclient.client import RBXClient
-
-key = open("key.txt", "r").read().strip()
-print(key)
+from keyring import get_password
+from credential_manager import open_app
+import threading
 
 mcp = FastMCP("Roblox MCP")
-roblox = RBXClient(key)
+roblox = RBXClient(get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY"))
 
 
 @mcp.tool
@@ -26,6 +26,14 @@ async def get_authenticated_user() -> dict:
 async def get_robux_balance() -> int:
     robux_balance = await roblox.fetch_robux_balance()
     return robux_balance
+
+
+@mcp.tool
+async def open_credential_manager() -> dict:
+    "open the credential manager to manage Roblox credentials (if not key set)"
+    open_app()
+    await roblox.set_roblox_auth_key(get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY"))
+    return {"success": True}
 
 
 @mcp.tool

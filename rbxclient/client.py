@@ -3,6 +3,8 @@ from roblox.utilities.requests import Requests
 from roblox.utilities.url import URLGenerator
 from roblox.utilities.exceptions import NotFound
 
+from keyring import set_password
+
 from rbxclient.deeplink import RobloxDeeplink
 from rbxclient.models.friends import (
     FriendUser,
@@ -21,6 +23,29 @@ class RBXClient:
         self._requests: Requests = Requests(url_generator=self._url_generator)
         self.authenticated_user: dict = {}
         self.set_token(token)
+        self._token: str | None = None
+
+    @staticmethod
+    def login_required(func):
+        async def wrapper(self, *args, **kwargs):
+            if not self._token:
+                return {
+                    "error": "User not authenticated. Please log in. (use login method)"
+                }
+            return await func(self, *args, **kwargs)
+
+        return wrapper
+
+    async def set_roblox_auth_key(self, key: str) -> None | dict:
+        """
+        Sets the Roblox authentication key for the client.
+        """
+        self._requests.session.cookies[".ROBLOSECURITY"] = key
+        self._token = key
+        try:
+            await self.set_authenticated_user()
+        except Exception as error:
+            return {"error": str(error)}
 
     @property
     def user_id(self) -> int:
@@ -50,6 +75,7 @@ class RBXClient:
         except NotFound as exception:
             raise exception
 
+    @login_required
     async def fetch_robux_balance(self) -> int:
         if not self.authenticated_user:
             await self.set_authenticated_user()
@@ -64,6 +90,7 @@ class RBXClient:
         balance_data = balance_response.json()
         return balance_data.get("robux", 0)
 
+    @login_required
     async def fetch_user_presences(self, user_ids: list[int]) -> list[UserPresence]:
         try:
             presence_response = await self._requests.post(
@@ -90,6 +117,7 @@ class RBXClient:
             for presence in presence_data.get("userPresences", [])
         ]
 
+    @login_required
     async def fetch_friends(self, with_presence: bool = True) -> list[FriendUser]:
         if not self.authenticated_user:
             await self.set_authenticated_user()
@@ -122,6 +150,7 @@ class RBXClient:
     def set_token(self, token: str):
         self.client.set_token(token)
         self._requests.session.cookies[".ROBLOSECURITY"] = token
+        self._token = token
 
     def get_client(self):
         return self.client
