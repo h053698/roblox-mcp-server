@@ -3,8 +3,6 @@ from roblox.utilities.requests import Requests
 from roblox.utilities.url import URLGenerator
 from roblox.utilities.exceptions import NotFound
 
-from keyring import set_password
-
 from rbxclient.deeplink import RobloxDeeplink
 from rbxclient.models.friends import (
     FriendUser,
