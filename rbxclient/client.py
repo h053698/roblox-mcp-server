@@ -76,6 +76,21 @@ class RBXClient:
             raise exception
 
     @login_required
+    async def fetch_unread_private_message_count(self) -> int:
+        if not self.authenticated_user:
+            await self.set_authenticated_user()
+        try:
+            unread_response = await self._requests.get(
+                url=self._url_generator.get_url(
+                    "privatemessages", f"v1/messages/unread/count"
+                )
+            )
+        except NotFound as exception:
+            raise exception
+        unread_data = unread_response.json()
+        return unread_data.get("count", 0)
+
+    @login_required
     async def fetch_robux_balance(self) -> int:
         if not self.authenticated_user:
             await self.set_authenticated_user()

@@ -32,7 +32,9 @@ async def get_robux_balance() -> int:
 async def open_credential_manager() -> dict:
     "open the credential manager to manage Roblox credentials (if not key set)"
     open_app()
-    await roblox.set_roblox_auth_key(get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY"))
+    await roblox.set_roblox_auth_key(
+        get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY")
+    )
     return {"success": True}
 
 
@@ -44,6 +46,13 @@ async def open_game_with_friends(
     "open a game with friends using the Roblox deeplink"
     roblox.deeplink.open_game(game_id, user_id)
     return {"success": True}
+
+
+@mcp.tool
+async def get_unread_private_message_count() -> int:
+    "get the count of unread private messages for the authenticated user"
+    unread_count = await roblox.fetch_unread_private_message_count()
+    return unread_count
 
 
 @mcp.tool
