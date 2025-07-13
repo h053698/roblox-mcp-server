@@ -77,7 +77,7 @@ class RBXClient:
             raise exception
 
     @login_required
-    async def fetch_discover_games(self) -> list[GameDiscoverTopic]:
+    async def fetch_discover_games(self, limit: int = 5) -> list[GameDiscoverTopic]:
         try:
             games_response = await self._requests.get(
                 url=self._url_generator.get_url("apis", "explore-api/v1/get-sorts"),
@@ -106,14 +106,13 @@ class RBXClient:
                             total_down_votes=game.get("totalDownVotes", 0),
                             is_sponsored=game.get("isSponsored", False),
                         )
-                        for game in topic.get("games", [])
+                        for game in topic.get("games", [])[:limit]
                     ],
                 )
                 for topic in recommend_games_response
             ]
         except NotFound as exception:
             raise exception
-        return games_response.json().get("data", [])
 
     @login_required
     async def fetch_unread_private_message_count(self) -> int:

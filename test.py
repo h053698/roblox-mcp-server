@@ -18,7 +18,27 @@ async def main():
         get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY")
     )
     friends = await roblox.fetch_discover_games()
-    print(friends)
+    discover_games = await roblox.fetch_discover_games()
+    print([
+        {
+            "sort_id": topic.sort_id,
+            "sort_display_name": topic.sort_display_name,
+            "applied_filter_detail": topic.applied_filter_detail,
+            "games": [
+                {
+                    "universe_id": game.universe_id,
+                    "place_id": game.place_id,
+                    "name": game.name,
+                    "player_count": game.player_count,
+                    "total_up_votes": game.total_up_votes,
+                    "total_down_votes": game.total_down_votes,
+                    "is_sponsored": game.is_sponsored,
+                }
+                for game in topic.games
+            ],
+        }
+        for topic in discover_games
+    ])
 
 
 if __name__ == "__main__":

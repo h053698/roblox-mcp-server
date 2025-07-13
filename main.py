@@ -2,7 +2,6 @@ from fastmcp import FastMCP
 from rbxclient.client import RBXClient
 from keyring import get_password
 from credential_manager import open_app
-
 mcp = FastMCP("Roblox MCP")
 roblox = RBXClient(get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY"))
 
@@ -107,6 +106,13 @@ async def get_friends() -> list[dict]:
         }
         for friend in friends
     ]
+
+@mcp.tool
+async def get_discover_games() -> list[dict]:
+    """get the discover games for the authenticated user
+    if user want to join a game, use the `open_game_with_friends` tool with game place id (not universe id)
+    """
+    return await roblox.fetch_discover_games()
 
 
 if __name__ == "__main__":
