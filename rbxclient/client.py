@@ -1,3 +1,4 @@
+from uuid import uuid4
 from roblox import Client
 from roblox.utilities.requests import Requests
 from roblox.utilities.url import URLGenerator
@@ -10,6 +11,7 @@ from rbxclient.models.friends import (
     UserPresenceStatus,
     UserPresenceGame,
 )
+from rbxclient.models.game import GameDiscoverTopic, Game
 
 BASE_URL: str = "roblox.com"
 
@@ -22,6 +24,7 @@ class RBXClient:
         self.authenticated_user: dict = {}
         self.set_token(token)
         self._token: str | None = None
+        self._roblox_session_id: str = str(uuid4())
 
     @staticmethod
     def login_required(func):
@@ -72,6 +75,45 @@ class RBXClient:
             }
         except NotFound as exception:
             raise exception
+
+    @login_required
+    async def fetch_discover_games(self) -> list[GameDiscoverTopic]:
+        try:
+            games_response = await self._requests.get(
+                url=self._url_generator.get_url("apis", "explore-api/v1/get-sorts"),
+                params={
+                    "sessionId": self._roblox_session_id,
+                    "device": "computer",
+                    "country": "all",
+                    "cpuCores": 8,
+                    "maxResolution": "1920x1080",
+                },
+            )
+            topic_data = games_response.json()
+            recommend_games_response = topic_data["sorts"][1:]
+            return [
+                GameDiscoverTopic(
+                    sort_id=topic.get("sortId"),
+                    sort_display_name=topic.get("sortDisplayName"),
+                    applied_filter_detail=topic.get("appliedFilters"),
+                    games=[
+                        Game(
+                            universe_id=game.get("universeId"),
+                            place_id=game.get("rootPlaceId"),
+                            name=game.get("name"),
+                            player_count=game.get("playerCount", 0),
+                            total_up_votes=game.get("totalUpVotes", 0),
+                            total_down_votes=game.get("totalDownVotes", 0),
+                            is_sponsored=game.get("isSponsored", False),
+                        )
+                        for game in topic.get("games", [])
+                    ],
+                )
+                for topic in recommend_games_response
+            ]
+        except NotFound as exception:
+            raise exception
+        return games_response.json().get("data", [])
 
     @login_required
     async def fetch_unread_private_message_count(self) -> int:
