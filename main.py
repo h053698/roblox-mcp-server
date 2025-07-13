@@ -2,7 +2,6 @@ from fastmcp import FastMCP
 from rbxclient.client import RBXClient
 from keyring import get_password
 from credential_manager import open_app
-import threading
 
 mcp = FastMCP("Roblox MCP")
 roblox = RBXClient(get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY"))

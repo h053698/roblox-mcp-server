@@ -1,10 +1,8 @@
 from fastmcp import FastMCP
 from rbxclient.client import RBXClient
+from keyring import get_password
 
-key = open("key.txt", "r").read().strip()
-print(key)
-
-roblox = RBXClient(key)
+roblox = RBXClient(get_password("ROBLOX_MCP_SERVER", ".ROBLOXSECURITY"))
 
 
 async def main():
